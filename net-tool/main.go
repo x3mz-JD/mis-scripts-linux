@@ -2,29 +2,37 @@ package main
 
 import (
     "fmt"
-    "os"
-    "os/exec" // <--- Paquete para ejecutar comandos de Linux
+    "os/exec"
+    "strings" // <--- NUEVO: Para poder buscar texto
 )
 
 func main() {
-    fmt.Println("--- LANZANDO PING A GOOGLE ---")
+    target := "google.com"
+    fmt.Println("--- ESPERANDO RESPUESTA DE", target, "---")
 
-    // 1. Preparamos el comando (Como si lo escribieras en la terminal)
-    // "ping" es el programa, "-c" y "1" son los argumentos (solo 1 paquete)
-    cmd := exec.Command("ping", "-c", "1", "google.com")
+    // 1. Preparamos el comando igual que ayer
+    cmd := exec.Command("ping", "-c", "1", target)
 
-    // 2. Conectamos la salida del comando a TU pantalla
-    // Si no hacemos esto, el ping ocurre "en silencio" y no verías nada.
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
+    // 2. CAMBIO IMPORTANTE: Ya no usamos cmd.Stdout = os.Stdout
+    // Usamos .Output() que devuelve lo que pasó (en bytes) y si hubo error.
+    outputBytes, err := cmd.Output()
 
-    // 3. ¡Fuego! Ejecutamos el comando
-    err := cmd.Run()
+    // 3. Convertimos los bytes extraños a Texto legible (String)
+    resultadoTexto := string(outputBytes)
 
-    // 4. Verificamos qué pasó
     if err != nil {
-        fmt.Println("\n❌ FALLO: No hay conexión o Google está caído.")
-    } else {
-        fmt.Println("\n✅ ÉXITO: El ping ha respondido correctamente.")
+        fmt.Println("❌ Error: El comando falló o no hay internet.")
+        return // Sale del programa
     }
-}
+
+    // 4. ANÁLISIS INTELIGENTE
+    // El programa lee el texto por nosotros.
+    // En Linux, un ping exitoso siempre contiene "ttl="
+    if strings.Contains(resultadoTexto, "ttl=") {
+        fmt.Println("✅ ÉXITO: Se encontró la palabra clave 'ttl='.")
+        fmt.Println("📝 REPORTE COMPLETO RECIBIDO:")
+        fmt.Println(resultadoTexto)
+    } else {
+        fmt.Println("⚠️ OJO: El comando corrió, pero la respuesta es rara.")
+    }
+} 
