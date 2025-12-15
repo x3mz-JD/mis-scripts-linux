@@ -2,37 +2,36 @@ package main
 
 import (
     "fmt"
+    "os"        // Necesario para leer variables de entorno
     "os/exec"
-    "strings" // <--- NUEVO: Para poder buscar texto
+    "strings"
 )
 
 func main() {
-    target := "google.com"
-    fmt.Println("--- ESPERANDO RESPUESTA DE", target, "---")
+    // 1. INTENTO LEER LA VARIABLE DESDE FUERA
+    target := os.Getenv("TARGET")
 
-    // 1. Preparamos el comando igual que ayer
+    // 2. SEGURIDAD: Si no me pasan nada, uso un valor por defecto
+    if target == "" {
+        target = "google.com"
+        fmt.Println("ℹ️ No se especificó TARGET, usando por defecto:", target)
+    }
+
+    fmt.Println("--- PINGEANDO A:", target, "---")
+
+    // El resto es igual que ayer...
     cmd := exec.Command("ping", "-c", "1", target)
-
-    // 2. CAMBIO IMPORTANTE: Ya no usamos cmd.Stdout = os.Stdout
-    // Usamos .Output() que devuelve lo que pasó (en bytes) y si hubo error.
     outputBytes, err := cmd.Output()
-
-    // 3. Convertimos los bytes extraños a Texto legible (String)
     resultadoTexto := string(outputBytes)
 
     if err != nil {
         fmt.Println("❌ Error: El comando falló o no hay internet.")
-        return // Sale del programa
+        return
     }
 
-    // 4. ANÁLISIS INTELIGENTE
-    // El programa lee el texto por nosotros.
-    // En Linux, un ping exitoso siempre contiene "ttl="
     if strings.Contains(resultadoTexto, "ttl=") {
-        fmt.Println("✅ ÉXITO: Se encontró la palabra clave 'ttl='.")
-        fmt.Println("📝 REPORTE COMPLETO RECIBIDO:")
-        fmt.Println(resultadoTexto)
+        fmt.Println("✅ ÉXITO: El servidor", target, "está vivo.")
     } else {
-        fmt.Println("⚠️ OJO: El comando corrió, pero la respuesta es rara.")
+        fmt.Println("⚠️ OJO: Respuesta extraña.")
     }
 } 
