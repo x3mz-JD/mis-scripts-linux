@@ -1,0 +1,8 @@
+version: '3.8'  # Versión del formato de Docker Compose
+
+services:       # Aquí empieza la lista de "máquinas"
+  vigilante:    # Nombre que le damos a nuestro servicio 
+    build: .    # Le decimos: "Construye la imagen usando el Dockerfile de AQUÍ (.)"
+    environment:
+      - TARGET=1.1.1.1  # Le pasa la variable por defecto
+    container_name: mi-vigilante-red  # Nombre bonito para el contenedor
