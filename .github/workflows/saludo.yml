@@ -1,0 +1,28 @@
+name: Mi Primer Robot 🤖
+
+# 1. EL DETONADOR (Trigger)
+# ¿Cuándo se activa esto? Cada vez que hagas un 'push' a la rama 'main'
+on:
+  push:
+    branches: [ "main" ]
+
+# 2. EL TRABAJO (Job)
+jobs:
+  saludar-al-jefe:
+    # ¿Dónde corre esto? GitHub nos presta un servidor Ubuntu gratis
+    runs-on: ubuntu-latest
+
+    # PASOS A SEGUIR
+    steps:
+      - name: Paso 1 - Saludar
+        run: echo "¡Hola Just! He detectado cambios en tu código."
+
+      - name: Paso 2 - Mostrar información del sistema
+        run: |
+          echo "Estoy corriendo en esta máquina:"
+          uname -a
+          echo "Y hoy es:"
+          date
+
+      - name: Paso 3 - Despedida
+        run: echo "¡Trabajo terminado! Todo parece estar bien."
